@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { Button } from '../Shared/Button';
 import { InputField } from '../Shared/InputField';
 import { useSupabaseAuth } from '../../hooks/useSupabaseClient';
+import { supabase } from '../../lib/supabaseClient';
 
 // Define validation schema using zod
 const loginSchema = z.object({
@@ -40,20 +41,40 @@ const LoginForm = () => {
       
       // In development mode, use 'admin@example.com' with any password
       if (email === 'admin@example.com') {
-        // Simulate successful login (will use mock Supabase client)
+        // Simuleer login met admin rol
         await signIn(email, password);
-        navigate('/admin');
+        window.location.href = '/admin';
         return;
       }
       
-      // For real authentication
+      // Voor echte authenticatie
       const result = await signIn(email, password);
-      
       if (result.error) {
-        throw new Error(result.error.message);
+        if (result.error.message && result.error.message.toLowerCase().includes('invalid login credentials')) {
+          setError('Ongeldig e-mailadres of wachtwoord. Probeer het opnieuw.');
+        } else {
+          setError(result.error.message || 'Er is een fout opgetreden bij het inloggen.');
+        }
+        return;
       }
-      
-      navigate('/admin');
+      // Haal de user opnieuw op zodat app_metadata zeker klopt (Supabase-js v2.x)
+      try {
+        const { data, error: getUserError } = await supabase.auth.getUser();
+        if (getUserError) {
+          setError(getUserError.message || 'Kon gebruiker niet ophalen na inloggen.');
+          return;
+        }
+        const user = data?.user;
+        const userRole = user?.app_metadata?.role || 'member';
+        console.log('Na login, userRole:', userRole, user);
+        if (userRole === 'admin') {
+          window.location.href = '/admin';
+        } else {
+          navigate('/'); // Later: naar eigen dashboard
+        }
+      } catch (err) {
+        setError('Kon gebruiker niet ophalen na inloggen.');
+      }
     } catch (err) {
       setError(err.message || 'Er is een fout opgetreden bij het inloggen.');
     }
@@ -67,8 +88,8 @@ const LoginForm = () => {
       className="w-full max-w-md mx-auto bg-white rounded-lg shadow-md p-8"
     >
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Admin Login</h2>
-        <p className="text-gray-600">Log in om toegang te krijgen tot het admin dashboard</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Login</h2>
+        <p className="text-gray-600">Log in om toegang te krijgen tot je dashboard</p>
       </div>
 
       {error && (
@@ -110,6 +131,7 @@ const LoginForm = () => {
         
         <div className="text-center text-sm text-gray-500 mt-4">
           <p>Voor demo: gebruik admin@example.com met een willekeurig wachtwoord</p>
+          <p>Je wordt na inloggen doorgestuurd naar het juiste dashboard op basis van je rol.</p>
         </div>
       </form>
     </motion.div>

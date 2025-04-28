@@ -9,27 +9,13 @@ const HomePage = () => {
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center">
-            <img 
-              src="/logo.svg" 
-              alt="InvestbotIQ Logo" 
-              className="h-10 w-auto mr-3"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = 'https://via.placeholder.com/40x40?text=IQ';
-              }}
-            />
+            
             <h1 className="text-xl font-bold text-blue-600">InvestbotIQ</h1>
           </div>
           <nav>
             <ul className="flex space-x-6">
               <li>
                 <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">Home</a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">Over ons</a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">Contact</a>
               </li>
               <li>
                 <a href="/admin" className="text-gray-600 hover:text-blue-600 transition-colors">Admin</a>
@@ -79,13 +65,7 @@ const HomePage = () => {
                 <li>
                   <a href="#" className="text-gray-300 hover:text-white transition-colors">Home</a>
                 </li>
-                <li>
-                  <a href="#" className="text-gray-300 hover:text-white transition-colors">Over ons</a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-300 hover:text-white transition-colors">Contact</a>
-                </li>
-                <li>
+                                                <li>
                   <a href="#" className="text-gray-300 hover:text-white transition-colors">Privacy Policy</a>
                 </li>
               </ul>

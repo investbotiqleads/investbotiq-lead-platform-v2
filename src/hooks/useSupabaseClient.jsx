@@ -12,37 +12,26 @@ export const useSupabaseAuth = () => {
 
   // Check for user session on mount
   useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (session?.user) {
-          setUser(session.user);
-        } else {
-          setUser(null);
-        }
-        setLoading(false);
-      }
-    );
+    setLoading(true);
+    const session = supabase.auth.session ? supabase.auth.session() : supabase.auth.getSession?.();
+    if (session && session.user) {
+      setUser(session.user);
+    } else {
+      setUser(null);
+    }
+    setLoading(false);
 
-    // Get initial session
-    const checkUser = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          setUser(session.user);
-        }
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
+    const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
+      if (session && session.user) {
+        setUser(session.user);
+      } else {
+        setUser(null);
       }
-    };
-
-    checkUser();
+      setLoading(false);
+    });
 
     return () => {
-      if (authListener && authListener.subscription) {
-        authListener.subscription.unsubscribe();
-      }
+      authListener?.unsubscribe && authListener.unsubscribe();
     };
   }, []);
 

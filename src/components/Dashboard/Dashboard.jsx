@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useSupabaseAuth, useSupabaseDb } from '../../hooks/useSupabaseClient';
+import { useUserRole } from '../../hooks/useUserRole';
 import { exportLeadsToSheets } from '../../lib/sheetsWebhook';
 import LeadsTable from './LeadsTable';
 import LeadDetailsModal from './LeadDetailsModal';
@@ -14,9 +15,10 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   
   const navigate = useNavigate();
-  const { user, loading: authLoading, isAdmin, signOut } = useSupabaseAuth();
+  const { user, loading: authLoading, signOut } = useSupabaseAuth();
   const { getAllLeads } = useSupabaseDb();
-  
+  const { role, error: roleError, loading: roleLoading } = useUserRole();
+
   // Fetch leads on component mount
   useEffect(() => {
     const fetchLeads = async () => {
@@ -31,15 +33,15 @@ const Dashboard = () => {
         setIsLoading(false);
       }
     };
-    
-    // Only fetch leads if user is authenticated and is an admin
-    if (user && isAdmin && !authLoading) {
+
+    // Only fetch leads if user is authenticated and is admin
+    if (user && role === 'admin' && !authLoading && !roleLoading) {
       fetchLeads();
-    } else if (!authLoading && (!user || !isAdmin)) {
+    } else if (!authLoading && !roleLoading && (!user || role !== 'admin')) {
       // Redirect to home if not authenticated or not admin
       navigate('/');
     }
-  }, [user, isAdmin, authLoading, getAllLeads, navigate]);
+  }, [user, role, authLoading, roleLoading, getAllLeads, navigate]);
   
   // Handle sign out
   const handleSignOut = async () => {
@@ -77,16 +79,27 @@ const Dashboard = () => {
   };
   
   // Show loading state
-  if (authLoading || (isLoading && leads.length === 0)) {
+  if (authLoading || roleLoading || (isLoading && leads.length === 0)) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <span className="text-blue-600 text-lg font-semibold">Dashboard laden...</span>
       </div>
     );
   }
-  
+
+  // Show error if unable to get role
+  if (roleError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <h1 className="text-2xl font-bold text-red-600 mb-4">Fout bij ophalen rol</h1>
+        <p className="text-gray-600 mb-6">{roleError.message}</p>
+        <Button onClick={() => navigate('/')}>Terug naar home</Button>
+      </div>
+    );
+  }
+
   // Show unauthorized message if not admin
-  if (!isAdmin) {
+  if (role !== 'admin') {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
         <h1 className="text-2xl font-bold text-red-600 mb-4">Toegang geweigerd</h1>
