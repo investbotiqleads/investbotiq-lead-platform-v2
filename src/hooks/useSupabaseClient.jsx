@@ -94,40 +94,158 @@ export const useSupabaseDb = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Submit lead form data
-  const submitLeadForm = async (formData) => {
+  // Helper: Log to lead_logs table (new schema)
+  async function logLeadEventV2({ lead_id = null, role = null, event_type, message, metadata = {} }) {
+    try {
+      await supabase.from('lead_logs').insert({
+        lead_id,
+        role,
+        event_type,
+        message,
+        metadata: JSON.stringify(metadata),
+        created_at: new Date().toISOString(),
+      });
+    } catch (e) {
+      // fallback: log to console
+      console.error('Lead log insert failed', e, message, metadata);
+    }
+  }
+
+  // Submit lead form data (with improved logging)
+  const submitLeadForm = async (formData, { userIp = null, userAgent = null } = {}) => {
+    setError(null);
     try {
       setLoading(true);
-      
-      const { role, ...leadData } = formData;
-      const tableName = `leads_${role.toLowerCase()}`;
-      
-      // Extract role-specific data into extra_data field
-      const commonFields = [
-        'first_name', 'last_name', 'email', 'phone', 
-        'birth_date', 'city', 'referral_code'
-      ];
-      
-      const extraData = {};
-      Object.keys(leadData).forEach(key => {
-        if (!commonFields.includes(key)) {
-          extraData[key] = leadData[key];
-          delete leadData[key];
+
+      // 0. Check for missing role
+      if (!formData.role) {
+        const msg = 'Rol ontbreekt';
+        await logLeadEventV2({ event_type: 'validation_error', message: msg, metadata: { input: formData, ip: userIp, browser: userAgent } });
+        throw new Error(msg);
+      }
+      const role = formData.role;
+
+      // 1. Validate required general fields
+      const generalFields = ['first_name', 'last_name', 'email', 'role'];
+      for (const field of generalFields) {
+        if (!formData[field]) {
+          const msg = `Veld ontbreekt: ${field}`;
+          await logLeadEventV2({ role, event_type: 'validation_error', message: msg, metadata: { input: formData, ip: userIp, browser: userAgent } });
+          throw new Error(msg);
         }
-      });
-      
-      // Insert into appropriate table
-      const { data, error } = await supabase
-        .from(tableName)
-        .insert([{
-          ...leadData,
-          role,
-          extra_data: extraData
-        }]);
-      
-      if (error) throw error;
-      
-      return data;
+      }
+
+      // 2. Validate required role fields
+      // const requiredRoleFields = requiredFieldsByRole[role];
+      // if (!requiredRoleFields) {
+      //   const msg = `Onbekende rol: ${role}`;
+      //   await logLeadEventV2({ role, event_type: 'validation_error', message: msg, metadata: { input: formData, ip: userIp, browser: userAgent } });
+      //   throw new Error(msg);
+      // }
+      // for (const field of requiredRoleFields) {
+      //   if (!formData[field]) {
+      //     const msg = `Rol-specifiek veld ontbreekt: ${field}`;
+      //     await logLeadEventV2({ role, event_type: 'validation_error', message: msg, metadata: { input: formData, ip: userIp, browser: userAgent } });
+      //     throw new Error(msg);
+      //   }
+      // }
+
+      // 3. Check if email already exists
+      const { data: existingEmail, error: emailError } = await supabase
+        .from('leads')
+        .select('id')
+        .eq('email', formData.email)
+        .maybeSingle();
+      if (emailError) {
+        await logLeadEventV2({ role, event_type: 'system_error', message: 'Email check error', metadata: { email: formData.email, error: emailError, ip: userIp, browser: userAgent } });
+        throw new Error('Fout bij controleren van e-mailadres');
+      }
+      if (existingEmail) {
+        const msg = 'E-mailadres bestaat al';
+        await logLeadEventV2({ role, event_type: 'validation_error', message: msg, metadata: { input: formData, ip: userIp, browser: userAgent } });
+        throw new Error(msg);
+      }
+
+      // 4. Insert general info
+      const generalData = {
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        email: formData.email,
+        role: formData.role
+      };
+      const { data: generalLead, error: leadError } = await supabase
+        .from('leads')
+        .insert([generalData])
+        .select()
+        .single();
+      if (leadError) {
+        await logLeadEventV2({ role, event_type: 'insert_error', message: 'Insert leads error', metadata: { error: leadError, data: generalData, ip: userIp, browser: userAgent } });
+        throw leadError;
+      }
+
+      // 5. Insert role-specific info
+      let roleTable = '';
+      let roleSpecificData = { lead_id: generalLead.id };
+      switch (role) {
+        case 'student':
+          Object.assign(roleSpecificData, {
+            education_level: formData.education_level,
+            field_of_study: formData.field_of_study,
+            investment_knowledge: formData.investment_knowledge,
+            start_amount: formData.start_amount,
+          });
+          roleTable = 'leads_student';
+          break;
+        case 'ouder':
+          Object.assign(roleSpecificData, {
+            child_age: formData.child_age,
+            investment_timeframe: formData.investment_timeframe,
+          });
+          roleTable = 'leads_ouder';
+          break;
+        case 'member':
+          Object.assign(roleSpecificData, {
+          });
+          roleTable = 'leads_member';
+          break;
+        case 'freelancer':
+          Object.assign(roleSpecificData, {
+            kvk_number: formData.kvk_number,
+            business_type: formData.business_type,
+            income_streams: formData.income_streams,
+          });
+          roleTable = 'leads_freelancer';
+          break;
+        case 'ondernemer':
+          Object.assign(roleSpecificData, {
+            company_name: formData.company_name,
+            business_stage: formData.business_stage,
+            team_size: formData.team_size,
+          });
+          roleTable = 'leads_ondernemer';
+          break;
+        case 'affiliated':
+          Object.assign(roleSpecificData, {
+            network_size: formData.network_size,
+            preferred_commission_model: formData.preferred_commission_model,
+          });
+          roleTable = 'leads_affiliated';
+          break;
+        default:
+          throw new Error('Onbekende rol: ' + role);
+      }
+      const { error: roleError } = await supabase
+        .from(roleTable)
+        .insert([roleSpecificData]);
+      if (roleError) {
+        // Rollback: verwijder de general lead
+        await supabase.from('leads').delete().eq('id', generalLead.id);
+        await logLeadEventV2({ lead_id: generalLead.id, role, event_type: 'rollback', message: 'Rol-insert error, rollback uitgevoerd', metadata: { error: roleError, generalLead, roleSpecificData, ip: userIp, browser: userAgent } });
+        throw new Error('Fout bij opslaan van rol-specifieke gegevens. Probeer opnieuw.');
+      }
+
+      await logLeadEventV2({ lead_id: generalLead.id, role, event_type: 'insert_success', message: `Lead succesvol opgeslagen (${role})`, metadata: { input: formData, generalLead, roleSpecificData, ip: userIp, browser: userAgent } });
+      return generalLead;
     } catch (error) {
       setError(error.message);
       throw error;

@@ -5,7 +5,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Flag to determine if we're in development mode
-const isDevelopment = true; // Set to false in production
+const isDevelopment = false; // Set to false in production
 
 // Mock Supabase client for development
 const mockSupabase = {
@@ -15,17 +15,64 @@ const mockSupabase = {
     getSession: async () => ({ data: { session: { user: { email: 'admin@example.com', app_metadata: { role: 'admin' } } } }, error: null }),
     onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
   },
-  from: (table) => ({
-    select: () => ({
-      order: () => ({
-        eq: () => ({
-          single: async () => ({ data: mockData[table]?.[0] || null, error: null }),
-        }),
-        async: () => ({ data: mockData[table] || [], error: null }),
-      }),
-    }),
-    insert: () => ({ error: null }),
-  }),
+  from: (table) => {
+    let query = { table, filters: [], selected: null };
+    return {
+      select: function (columns) {
+        query.selected = columns;
+        return this;
+      },
+      eq: function (column, value) {
+        query.filters.push({ column, value });
+        return this;
+      },
+      maybeSingle: async function () {
+        // Simuleer filteren op email (voor leads)
+        let dataArr = mockData[query.table] || [];
+        for (const f of query.filters) {
+          dataArr = dataArr.filter(row => row[f.column] === f.value);
+        }
+        return { data: dataArr.length > 0 ? dataArr[0] : null, error: null };
+      },
+      single: async function () {
+        let dataArr = mockData[query.table] || [];
+        for (const f of query.filters) {
+          dataArr = dataArr.filter(row => row[f.column] === f.value);
+        }
+        return { data: dataArr.length > 0 ? dataArr[0] : null, error: null };
+      },
+      insert: function (insertData) {
+        // Simuleer insert chaining zoals Supabase: insert().select() of insert().select().single()
+        const chain = {
+          select: function () {
+            return {
+              single: async function () {
+                // Voeg toe aan mockData
+                if (!mockData[query.table]) mockData[query.table] = [];
+                const newRow = { id: String(mockData[query.table].length + 1), ...insertData[0], created_at: new Date().toISOString() };
+                mockData[query.table].push(newRow);
+                return { data: newRow, error: null };
+              },
+              async then(resolve) { // allow await insert().select()
+                if (!mockData[query.table]) mockData[query.table] = [];
+                const newRow = { id: String(mockData[query.table].length + 1), ...insertData[0], created_at: new Date().toISOString() };
+                mockData[query.table].push(newRow);
+                resolve({ data: [newRow], error: null });
+              }
+            };
+          },
+          async then(resolve) { // allow await insert() directly
+            if (!mockData[query.table]) mockData[query.table] = [];
+            const newRow = { id: String(mockData[query.table].length + 1), ...insertData[0], created_at: new Date().toISOString() };
+            mockData[query.table].push(newRow);
+            resolve({ data: [newRow], error: null });
+          }
+        };
+        return chain;
+      },
+      order: function () { return this; },
+    };
+  },
 };
 
 // Mock data for development
@@ -45,9 +92,6 @@ const mockData = {
     { id: '3', first_name: 'Bob', last_name: 'Johnson', email: 'bob@example.com', phone: '+31698765432', birth_date: '1995-10-20', city: 'Utrecht', role: 'parent', referral_code: 'REF456', extra_data: { child_age: '6_to_12' }, created_at: new Date().toISOString() },
   ],
 };
-
-// Use mock client in development, real client in production
-export const supabase = isDevelopment ? mockSupabase : createClient(supabaseUrl, supabaseAnonKey);
 
 // Helper function to get the appropriate table name based on role
 export const getLeadTableName = (role) => {
@@ -124,3 +168,6 @@ export const getLeadById = async (role, id) => {
   
   return data;
 };
+
+// Use mock client in development, real client in production
+export const supabase = isDevelopment ? mockSupabase : createClient(supabaseUrl, supabaseAnonKey);

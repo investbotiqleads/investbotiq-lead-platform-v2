@@ -8,42 +8,24 @@ export const commonFields = [
     label: 'Voornaam',
     type: 'text',
     placeholder: 'Voer je voornaam in',
-    required: true,
-    validation: {
-      required: 'Voornaam is verplicht',
-      minLength: {
-        value: 2,
-        message: 'Voornaam moet minimaal 2 karakters bevatten'
-      }
-    }
+    required: false,
+    validation: {}
   },
   {
     id: 'last_name',
     label: 'Achternaam',
     type: 'text',
     placeholder: 'Voer je achternaam in',
-    required: true,
-    validation: {
-      required: 'Achternaam is verplicht',
-      minLength: {
-        value: 2,
-        message: 'Achternaam moet minimaal 2 karakters bevatten'
-      }
-    }
+    required: false,
+    validation: {}
   },
   {
     id: 'email',
     label: 'E-mailadres',
     type: 'email',
     placeholder: 'Voer je e-mailadres in',
-    required: true,
-    validation: {
-      required: 'E-mailadres is verplicht',
-      pattern: {
-        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-        message: 'Ongeldig e-mailadres'
-      }
-    }
+    required: false,
+    validation: {}
   },
   {
     id: 'phone',
@@ -51,12 +33,7 @@ export const commonFields = [
     type: 'tel',
     placeholder: 'Voer je telefoonnummer in',
     required: false,
-    validation: {
-      pattern: {
-        value: /^[0-9+\s()-]{10,15}$/,
-        message: 'Ongeldig telefoonnummer'
-      }
-    }
+    validation: {}
   },
   {
     id: 'birth_date',
@@ -95,26 +72,8 @@ export const roleBasedQuestions = {
         { value: 'intermediate', label: 'Gemiddeld (1-3 jaar)' },
         { value: 'advanced', label: 'Gevorderd (3+ jaar)' }
       ],
-      required: true,
-      validation: {
-        required: 'Dit veld is verplicht'
-      }
-    },
-    {
-      id: 'investment_goal',
-      label: 'Wat is je belangrijkste investeringsdoel?',
-      type: 'select',
-      options: [
-        { value: 'wealth_growth', label: 'Vermogensgroei' },
-        { value: 'passive_income', label: 'Passief inkomen' },
-        { value: 'retirement', label: 'Pensioen' },
-        { value: 'financial_freedom', label: 'Financiële vrijheid' },
-        { value: 'other', label: 'Anders' }
-      ],
-      required: true,
-      validation: {
-        required: 'Dit veld is verplicht'
-      }
+      required: false,
+      validation: {}
     },
     {
       id: 'investment_amount',
@@ -126,78 +85,13 @@ export const roleBasedQuestions = {
         { value: '25k_to_100k', label: '€25.000 - €100.000' },
         { value: 'more_than_100k', label: 'Meer dan €100.000' }
       ],
-      required: true,
-      validation: {
-        required: 'Dit veld is verplicht'
-      }
-    }
-  ],
-  
-  // Freelancer role questions
-  freelancer: [
-    {
-      id: 'expertise',
-      label: 'Wat is je expertise?',
-      type: 'select',
-      options: [
-        { value: 'development', label: 'Software Ontwikkeling' },
-        { value: 'design', label: 'Design' },
-        { value: 'marketing', label: 'Marketing' },
-        { value: 'content', label: 'Content Creatie' },
-        { value: 'finance', label: 'Financiën' },
-        { value: 'other', label: 'Anders' }
-      ],
-      required: true,
-      validation: {
-        required: 'Dit veld is verplicht'
-      }
-    },
-    {
-      id: 'experience_years',
-      label: 'Hoeveel jaar ervaring heb je?',
-      type: 'select',
-      options: [
-        { value: 'less_than_1', label: 'Minder dan 1 jaar' },
-        { value: '1_to_3', label: '1-3 jaar' },
-        { value: '3_to_5', label: '3-5 jaar' },
-        { value: 'more_than_5', label: 'Meer dan 5 jaar' }
-      ],
-      required: true,
-      validation: {
-        required: 'Dit veld is verplicht'
-      }
-    },
-    {
-      id: 'availability',
-      label: 'Wat is je beschikbaarheid?',
-      type: 'select',
-      options: [
-        { value: 'part_time', label: 'Part-time' },
-        { value: 'full_time', label: 'Full-time' },
-        { value: 'project_based', label: 'Project-basis' }
-      ],
-      required: true,
-      validation: {
-        required: 'Dit veld is verplicht'
-      }
-    },
-    {
-      id: 'portfolio',
-      label: 'Link naar je portfolio of LinkedIn',
-      type: 'url',
-      placeholder: 'https://',
       required: false,
-      validation: {
-        pattern: {
-          value: /^https?:\/\/.+/,
-          message: 'Voer een geldige URL in'
-        }
-      }
+      validation: {}
     }
   ],
   
-  // Parent role questions
-  parent: [
+  // Ouder (parent) role questions
+  ouder: [
     {
       id: 'child_age',
       label: 'Wat is de leeftijd van je kind?',
@@ -208,25 +102,8 @@ export const roleBasedQuestions = {
         { value: '13_to_17', label: '13-17 jaar' },
         { value: '18_plus', label: '18+ jaar' }
       ],
-      required: true,
-      validation: {
-        required: 'Dit veld is verplicht'
-      }
-    },
-    {
-      id: 'investment_goal',
-      label: 'Wat is je investeringsdoel voor je kind?',
-      type: 'select',
-      options: [
-        { value: 'education', label: 'Opleiding' },
-        { value: 'future_security', label: 'Toekomstige zekerheid' },
-        { value: 'wealth_building', label: 'Vermogensopbouw' },
-        { value: 'other', label: 'Anders' }
-      ],
-      required: true,
-      validation: {
-        required: 'Dit veld is verplicht'
-      }
+      required: false,
+      validation: {}
     },
     {
       id: 'investment_timeframe',
@@ -237,10 +114,8 @@ export const roleBasedQuestions = {
         { value: 'medium_term', label: 'Middellange termijn (5-10 jaar)' },
         { value: 'long_term', label: 'Lange termijn (> 10 jaar)' }
       ],
-      required: true,
-      validation: {
-        required: 'Dit veld is verplicht'
-      }
+      required: false,
+      validation: {}
     }
   ],
   
@@ -257,41 +132,29 @@ export const roleBasedQuestions = {
         { value: 'university', label: 'Universiteit' },
         { value: 'other', label: 'Anders' }
       ],
-      required: true,
-      validation: {
-        required: 'Dit veld is verplicht'
-      }
+      required: false,
+      validation: {}
     },
     {
       id: 'field_of_study',
       label: 'Wat is je studierichting?',
-      type: 'select',
-      options: [
-        { value: 'business', label: 'Bedrijfskunde/Economie' },
-        { value: 'tech', label: 'Techniek/IT' },
-        { value: 'science', label: 'Wetenschap' },
-        { value: 'arts', label: 'Kunst/Cultuur' },
-        { value: 'other', label: 'Anders' }
-      ],
-      required: true,
-      validation: {
-        required: 'Dit veld is verplicht'
-      }
+      type: 'text',
+      placeholder: 'Bijvoorbeeld: economie, techniek',
+      required: false,
+      validation: {}
     },
     {
       id: 'investment_knowledge',
-      label: 'Hoe zou je je kennis over investeren omschrijven?',
+      label: 'Hoeveel weet je al van investeren?',
       type: 'select',
       options: [
-        { value: 'none', label: 'Geen kennis' },
-        { value: 'basic', label: 'Basiskennis' },
-        { value: 'intermediate', label: 'Gemiddelde kennis' },
-        { value: 'advanced', label: 'Gevorderde kennis' }
+        { value: 'none', label: 'Niets' },
+        { value: 'basic', label: 'Basis' },
+        { value: 'intermediate', label: 'Gemiddeld' },
+        { value: 'advanced', label: 'Gevorderd' }
       ],
-      required: true,
-      validation: {
-        required: 'Dit veld is verplicht'
-      }
+      required: false,
+      validation: {}
     },
     {
       id: 'start_amount',
@@ -303,83 +166,8 @@ export const roleBasedQuestions = {
         { value: '1000_to_5000', label: '€1.000 - €5.000' },
         { value: 'more_than_5000', label: 'Meer dan €5.000' }
       ],
-      required: true,
-      validation: {
-        required: 'Dit veld is verplicht'
-      }
-    }
-  ],
-  
-  // Affiliated role questions
-  affiliated: [
-    {
-      id: 'company_name',
-      label: 'Bedrijfsnaam',
-      type: 'text',
-      placeholder: 'Voer je bedrijfsnaam in',
-      required: true,
-      validation: {
-        required: 'Bedrijfsnaam is verplicht'
-      }
-    },
-    {
-      id: 'industry',
-      label: 'In welke sector ben je actief?',
-      type: 'select',
-      options: [
-        { value: 'finance', label: 'Financiën' },
-        { value: 'tech', label: 'Technologie' },
-        { value: 'education', label: 'Onderwijs' },
-        { value: 'retail', label: 'Retail' },
-        { value: 'other', label: 'Anders' }
-      ],
-      required: true,
-      validation: {
-        required: 'Dit veld is verplicht'
-      }
-    },
-    {
-      id: 'partnership_type',
-      label: 'Welk type samenwerking zoek je?',
-      type: 'select',
-      options: [
-        { value: 'referral', label: 'Referral Programma' },
-        { value: 'co_marketing', label: 'Co-marketing' },
-        { value: 'integration', label: 'Product Integratie' },
-        { value: 'other', label: 'Anders' }
-      ],
-      required: true,
-      validation: {
-        required: 'Dit veld is verplicht'
-      }
-    },
-    {
-      id: 'company_size',
-      label: 'Hoe groot is je bedrijf?',
-      type: 'select',
-      options: [
-        { value: 'solo', label: 'Eenmanszaak' },
-        { value: 'small', label: 'Klein (2-10 medewerkers)' },
-        { value: 'medium', label: 'Middelgroot (11-50 medewerkers)' },
-        { value: 'large', label: 'Groot (50+ medewerkers)' }
-      ],
-      required: true,
-      validation: {
-        required: 'Dit veld is verplicht'
-      }
-    },
-    {
-      id: 'website',
-      label: 'Website',
-      type: 'url',
-      placeholder: 'https://',
       required: false,
-      validation: {
-        pattern: {
-          value: /^https?:\/\/.+/,
-          message: 'Voer een geldige URL in'
-        }
-      }
+      validation: {}
     }
   ]
 };

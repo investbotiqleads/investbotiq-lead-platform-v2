@@ -1,34 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import { useFormContext } from 'react-hook-form';
 import { Button } from '../Shared/Button';
 import { InputField } from '../Shared/InputField';
 
-// Define validation schema using zod
-const formSchema = z.object({
-  first_name: z.string().min(2, { message: 'Voornaam moet minimaal 2 karakters bevatten' }),
-  last_name: z.string().min(2, { message: 'Achternaam moet minimaal 2 karakters bevatten' }),
-  email: z.string().email({ message: 'Ongeldig e-mailadres' }),
-  phone: z.string().optional()
-});
-
-const LeadFormStep2 = ({ onSubmit, onBack, initialData = {} }) => {
-  // Initialize form with react-hook-form and zod validation
-  const { 
-    register, 
-    handleSubmit, 
-    formState: { errors, isSubmitting } 
-  } = useForm({
-    resolver: zodResolver(formSchema),
-    defaultValues: initialData
-  });
-
-  // Handle form submission
-  const processSubmit = (data) => {
-    onSubmit(data);
-  };
+const LeadFormStep2 = () => {
+  const { register, formState: { errors, isSubmitting } } = useFormContext();
 
   return (
     <motion.div
@@ -43,7 +20,7 @@ const LeadFormStep2 = ({ onSubmit, onBack, initialData = {} }) => {
         <p className="text-gray-600">Vul je persoonlijke gegevens in</p>
       </div>
 
-      <form onSubmit={handleSubmit(processSubmit)} className="space-y-6">
+      <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <InputField
             label="Voornaam"
@@ -51,6 +28,7 @@ const LeadFormStep2 = ({ onSubmit, onBack, initialData = {} }) => {
             placeholder="Voer je voornaam in"
             error={errors.first_name?.message}
             required
+            className="transition-all hover:shadow-md focus:shadow-lg active:scale-[0.98] border hover:border-blue-400 focus:border-blue-500"
             {...register('first_name')}
           />
           
@@ -60,6 +38,7 @@ const LeadFormStep2 = ({ onSubmit, onBack, initialData = {} }) => {
             placeholder="Voer je achternaam in"
             error={errors.last_name?.message}
             required
+            className="transition-all hover:shadow-md focus:shadow-lg active:scale-[0.98] border hover:border-blue-400 focus:border-blue-500"
             {...register('last_name')}
           />
         </div>
@@ -71,6 +50,7 @@ const LeadFormStep2 = ({ onSubmit, onBack, initialData = {} }) => {
           placeholder="Voer je e-mailadres in"
           error={errors.email?.message}
           required
+          className="transition-all hover:shadow-md focus:shadow-lg active:scale-[0.98] border hover:border-blue-400 focus:border-blue-500"
           {...register('email')}
         />
 
@@ -80,26 +60,12 @@ const LeadFormStep2 = ({ onSubmit, onBack, initialData = {} }) => {
           type="tel"
           placeholder="Voer je telefoonnummer in"
           error={errors.phone?.message}
+          className="transition-all hover:shadow-md focus:shadow-lg active:scale-[0.98] border hover:border-blue-400 focus:border-blue-500"
           {...register('phone')}
         />
 
-        <div className="flex justify-between pt-4">
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={onBack}
-          >
-            Terug
-          </Button>
-          
-          <Button 
-            type="submit" 
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Bezig...' : 'Volgende'}
-          </Button>
-        </div>
-      </form>
+        {/* Navigation handled at main form level */}
+      </div>
     </motion.div>
   );
 };

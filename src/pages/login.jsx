@@ -10,7 +10,7 @@ const LoginPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center">
             <img 
-              src="/logo.svg" 
+              src="/investbotiq_no_text.svg" 
               alt="InvestbotIQ Logo" 
               className="h-10 w-auto mr-3"
               onError={(e) => {

@@ -1,102 +1,71 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import LeadForm from '../components/LeadForm/LeadForm';
+import GoogleMultiStepForm from '../components/GoogleMultiStepForm';
+import OrbCanvas from '../components/Shared/OrbCanvas';
+
+const blobs = [
+  { className: 'absolute top-[-100px] left-[-100px] w-[32rem] h-[32rem] bg-purple-400 opacity-40 rounded-full filter blur-[80px] shadow-[0_0_80px_40px_rgba(168,139,250,0.15)]', style: { animationDelay: '0s' } },
+  { className: 'absolute top-[30%] left-[60%] w-[28rem] h-[28rem] bg-purple-300 opacity-30 rounded-full filter blur-[72px] shadow-[0_0_80px_40px_rgba(168,139,250,0.12)]', style: { animationDelay: '2s' } },
+];
 
 const HomePage = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center">
-            
-            <h1 className="text-xl font-bold text-blue-600">InvestbotIQ</h1>
-          </div>
-          <nav>
-            <ul className="flex space-x-6">
-              <li>
-                <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">Home</a>
-              </li>
-              <li>
-                <a href="/admin" className="text-gray-600 hover:text-blue-600 transition-colors">Admin</a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </header>
-
+    <div className="relative min-h-screen bg-gradient-to-b from-purple-50 via-white to-white overflow-hidden font-sans">
+      {/* Paarse bokeh blobs zoals loginpagina */}
+      {blobs.map((blob, i) => (
+        <div key={i} className={blob.className} style={blob.style}></div>
+      ))}
       {/* Hero section */}
-      <section className="py-12 px-4">
-        <motion.div 
-          className="max-w-4xl mx-auto text-center"
+      <section className="flex flex-col items-center justify-center min-h-[60vh] text-center relative z-30">
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.7 }}
         >
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Welkom bij InvestbotIQ
-          </h2>
-          <p className="text-xl text-gray-600 mb-8">
-            Vul het formulier in om je aan te melden en ontdek hoe wij je kunnen helpen.
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+            <img src="/1%20-%20kopie.png" alt="" className="max-h-20 w-auto" style={{objectFit: 'contain'}} />
+          </div>
+          <h1 className="text-3xl md:text-5xl font-extrabold text-purple-700 mb-4 mt-24" style={{letterSpacing: '-0.01em', textTransform: 'uppercase'}}>
+            AUTOMATISCH MAANDELIJKSE CASHFLOW OPBOUWEN
+          </h1>
+          <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-xl mx-auto">
+            De slimme manier om je inkomsten te laten groeien: automatisering,<br className="hidden md:block" /> transparantie en resultaat – zonder gedoe.
           </p>
+          <a href="https://loginvestbotiq.netlify.app" className="inline-block px-8 py-3 bg-purple-600 text-white rounded-lg shadow font-semibold text-lg hover:bg-purple-700 transition">
+            Inloggen
+          </a>
+          {/* Kleine orb-animatie onder inloggen */}
+          <div className="flex justify-center mt-4">
+            <OrbCanvas />
+          </div>
         </motion.div>
       </section>
-
       {/* Lead form section */}
-      <section className="py-8 px-4 mb-16">
-        <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
-          <LeadForm />
-        </div>
-      </section>
+      <section className="py-8 px-4 mb-16 relative z-40">
 
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <h3 className="text-lg font-semibold mb-4">InvestbotIQ</h3>
-              <p className="text-gray-300">
-                Wij helpen je bij het maken van slimme investeringskeuzes.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Links</h3>
-              <ul className="space-y-2">
-                <li>
-                  <a href="#" className="text-gray-300 hover:text-white transition-colors">Home</a>
-                </li>
-                                                <li>
-                  <a href="#" className="text-gray-300 hover:text-white transition-colors">Privacy Policy</a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Contact</h3>
-              <p className="text-gray-300 mb-2">Email: investbotiq@gmail.com</p>
-              <div className="flex space-x-4 mt-4">
-                <a href="#" className="text-gray-300 hover:text-white transition-colors">
-                  <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
-                  </svg>
-                </a>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors">
-                  <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-                  </svg>
-                </a>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors">
-                  <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-                  </svg>
-                </a>
-              </div>
-            </div>
-          </div>
-          <div className="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400">
-            <p>&copy; {new Date().getFullYear()} InvestbotIQ. Alle rechten voorbehouden.</p>
-          </div>
+        {/* Google Multi-Step Formulier */}
+        <div className="max-w-4xl mx-auto bg-white/70 rounded-2xl shadow-lg overflow-hidden backdrop-blur mt-8 p-8">
+          <div className="flex justify-center mb-4">
+  <a href="https://investbotiq.netlify.app/" target="_self" rel="noopener noreferrer">
+    <img src="/2%20-%20kopie.png" alt="Logo 2" className="max-h-16 w-auto" style={{objectFit: 'contain'}} />
+  </a>
+</div>
+          <GoogleMultiStepForm />
         </div>
-      </footer>
+
+      </section>
+      {/* Extra CSS for animated blobs */}
+      <style>{`
+        .animate-blob {
+          animation: blob 13s infinite;
+        }
+        @keyframes blob {
+          0%, 100% { transform: scale(1) translate(0, 0); }
+          33% { transform: scale(1.14, 0.93) translate(40px, -30px); }
+          66% { transform: scale(0.91, 1.12) translate(-30px, 40px); }
+        }
+      `}</style>
     </div>
   );
 };
