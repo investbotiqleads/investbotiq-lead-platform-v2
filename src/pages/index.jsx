@@ -23,9 +23,7 @@ const HomePage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
         >
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-            <img src="/1%20-%20kopie.png" alt="" className="max-h-20 w-auto" style={{objectFit: 'contain'}} />
-          </div>
+          
           <h1 className="text-3xl md:text-5xl font-extrabold text-purple-700 mb-4 mt-24" style={{letterSpacing: '-0.01em', textTransform: 'uppercase'}}>
             AUTOMATISCH MAANDELIJKSE CASHFLOW OPBOUWEN
           </h1>
